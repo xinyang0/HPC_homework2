@@ -70,7 +70,10 @@ int main(int argc, char * argv[])
 	u[i][0] = u[i][N+1] = 0.0;
 	u[0][i] = u[N+1][i] = 0.0;
   }
-  
+  for (i=0; i < N+2 ; i++) {
+	unew[i][0] = unew[i][N+1] = 0.0;
+	unew[0][i] = unew[N+1][i] = 0.0;
+  }
 
   for (iter = 0; iter < max_iters && res/res0 > tol; iter++) {
 
