@@ -1,0 +1,65 @@
+\documentclass{article}
+\usepackage{showkeys}
+\usepackage{amsmath, amsfonts}
+\usepackage{ amssymb }
+\usepackage{ wasysym }
+\usepackage{listings}
+\usepackage{graphics,epsfig,graphicx,float,subfigure,color}
+\usepackage[top=1in, bottom=1in, left=1.25in, right=1.25in]{geometry}
+%\usepackage{blindtext}
+%\usepackage[utf8]{inputenc}
+
+\begin{document}
+{\centering
+{\LARGE{Assignment 2}}\\
+\vspace{0.5cm}
+Xinyang Wang\\}
+\vspace{0.5cm}
+\noindent 1. omp$\_$bug2: by default, variables 'tid' and 'total' are shared among all threads, so the final results are always four same sentences with 'tid' equal to the last thread number that reaches '$\sharp$pragma omp barrier', and 'total' equal to the true sum (maybe incorrect due to race condition).
+To avoid this, use '$\sharp$pragma omp parallel private(i,tid,total)' instead.\\
+\\omp$\_$bug3: '$\sharp$pragma omp barrier' can not be used omp sections block or closely nested inside a critical region. Delete it.
+\\omp$\_$bug4: the segmentation fault is caused by the large array size which exceeds the maximum thread stack size limit. One can choose a smaller N or enlarge the stack size limit before complie omp$\_$bug4. To set a large stack size, we can use the command 'limit stacksize unlimited' or 'setenv KMP$\_$STACKSIZE 20000000' for linux system. For other systems, see the './bashrc' files. Use the command 'source ./bashrc' before compiling. 
+\\omp$\_$bug5: in eack omp section, the thread acquires 'locka' ('lockb') and then tries to get 'lockb' ('lock1') before releasing 'locka' ('lockb'), which cause deadlock. To solve this, we should release 'locka' before acquire 'lockb'. Execute 'omp$\_$unset$\_$lock($\&$locka);'  before 'omp$\_$set$\_$lock($\&$lockb);'.\\
+\\omp$\_$bug6: we get an error message: "Error: reduction variable "sum" must be shared on entry to this OpenMP pragma. "  '$\sharp$pragma omp for reduction(+:sum)' in the main function is not shared in dotprod. Define 'float sum' before dotprod function, delete 'float sum' in the dotprod and main function.\\
+\\2. 
+machine: Linux 2.6.32-642.13.1.el6.x86$\_$64 (linax2.cims.nyu.edu) $\_$x86$\_$64(4 CPU)\\
+N=100, max$\_$iters=1000
+\begin{table}[H]
+\begin{tabular}{|c|c|c|}
+\hline
+&Jacobi2D-omp & Gauss-Seidel2D-omp\\
+\hline
+total iteration number& 1000& 1000\\
+\hline
+final residual &53.1112& 48.4237\\
+\hline
+timings & &\\
+ thread number =2&    0.037482s & 0.057203s \\
+           thread number =4& 0.023662 s& 0.045726s \\
+           thread number =8& 0.095894 s & 0.164615s\\
+\hline
+\end{tabular}
+\end{table}
+
+N=1000, max$\_$iters=1000
+\begin{table}[H]
+\begin{tabular}{|c|c|c|}
+\hline
+&Jacobi2D-omp & Gauss-Seidel2D-omp\\
+\hline
+total iteration number& 1000& 1000\\
+\hline
+final residual &953.09 & 1315.16\\
+\hline
+timings & &\\
+ thread number =2&    3.650388s & 3.109721s \\
+           thread number =4& 2.363728s & 1.639494s  \\
+           thread number =8& 2.910602 s & 2.437863 s\\
+\hline
+\end{tabular}
+\end{table}
+\noindent(1)Gauss-Seidel method using red-block coloring may need more iterations than sequential Gauss-Seidel method. It may be slower than parallel Jacobi method since it has two for loops.\\
+(2)Using 8 threads will make the program slower. I think this might because my machine only use 4 CPUs. If i want to use 8 threads, some threads on the same CPU have to wait.\\
+
+
+\end{document}
