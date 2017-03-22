@@ -91,7 +91,7 @@ int main(int argc, char * argv[])
     //  		}
       }
     }
-    if (0 == (iter % 10)) {
+    if (0 == (iter % 100)) {
       res = compute_residual(u, N, invhsq);
       printf("Iter %d: Residual: %g\n", iter, res);
     }
